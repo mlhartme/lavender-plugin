@@ -13,17 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.maven.plugins.application;
+package net.oneandone.maven.plugins.lavender;
 
+import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import org.apache.maven.plugin.AbstractMojo;
-import net.oneandone.sushi.fs.World;
-import net.oneandone.sushi.fs.Node;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
 
-public abstract class BaseMojo extends AbstractMojo {
+/**
+ * Generates an application file. Merges dependency jars into a single file, prepended with a launch shell script.
+ */
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.RUNTIME,
+      threadSafe = true)
+public class GenerateMojo extends AbstractMojo {
     protected final World world;
 
     /**
@@ -33,37 +43,23 @@ public abstract class BaseMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}")
     protected FileNode dir;
 
-    /**
-     * Name for the generated application file.
-     */
-    @Parameter(defaultValue = "${project.artifactId}")
-    protected String name;
+    @Parameter(property = "project", required = true, readonly = true)
+    private MavenProject project;
 
-    /**
-     * Classifier to deploy application files with.
-     * Specify a different value if you want to deploy multiple applications.
-     */
-    @Parameter(defaultValue = "application")
-    protected String classifier = "";
-
-    /**
-     * Type to deploy application files with.
-     */
-    @Parameter(defaultValue = "sh")
-    protected String type = "";
-
-    /**
-     * Permissions for application file.
-     */
-    @Parameter(defaultValue = "rwxr-xr-x")
-    protected String permissions = "";
-
-    public BaseMojo() throws IOException {
-        this(World.create());
+    public GenerateMojo() throws IOException {
+        this.world = World.create();
     }
 
-    public BaseMojo(World world) {
-        this.world = world;
+    public void execute() throws MojoExecutionException {
+        try {
+            doExecute();
+        } catch (IOException e) {
+            throw new MojoExecutionException("cannot generate application: " + e.getMessage(), e);
+        }
+    }
+
+    public void doExecute() throws IOException {
+        getLog().info("TODO");
     }
 
     public void setDir(String dir) {
@@ -72,9 +68,5 @@ public abstract class BaseMojo extends AbstractMojo {
 
     public Node getDir() {
         return dir;
-    }
-
-    public FileNode getFile() {
-        return dir.join(name);
     }
 }
