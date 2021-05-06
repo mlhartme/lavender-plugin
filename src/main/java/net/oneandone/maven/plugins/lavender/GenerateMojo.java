@@ -84,7 +84,6 @@ public class GenerateMojo extends AbstractMojo {
         String resourcePathPrefix;
         Properties p;
 
-        getLog().info("scmRevision: " + getScmRevision());
         scm = project.getScm();
         webapp = "war".equals(project.getPackaging());
         getLog().info("webapp: " + webapp);
@@ -96,7 +95,7 @@ public class GenerateMojo extends AbstractMojo {
         p.put("scm." + name, scm.getConnection());
         p.put("scm." + name + ".devel", scm.getDeveloperConnection());
         p.put("scm." + name + ".path", path);
-        p.put("scm." + name + ".tag", "" + "" + scm.getTag());
+        p.put("scm." + name + ".tag", "" + "" + getScmRevision());
         p.put("scm." + name + ".includes", includes);
         p.put("scm." + name + ".excludes", excludes);
         p.put("scm." + name + ".resourcePathPrefix", resourcePathPrefix);
