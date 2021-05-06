@@ -23,12 +23,18 @@ import net.oneandone.sushi.util.Separator;
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.scm.CommandParameters;
+import org.apache.maven.scm.ScmException;
+import org.apache.maven.scm.ScmFileSet;
+import org.apache.maven.scm.command.info.InfoScmResult;
+import org.apache.maven.scm.manager.ScmManager;
+import org.apache.maven.scm.repository.ScmRepository;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -54,6 +60,9 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
 
+    @Component
+    private ScmManager scmManager;
+
     public GenerateMojo() throws IOException {
         this.world = World.create();
     }
@@ -66,7 +75,7 @@ public class GenerateMojo extends AbstractMojo {
         }
     }
 
-    public void doExecute() throws IOException {
+    public void doExecute() throws IOException, MojoExecutionException {
         Scm scm;
         boolean webapp;
         String name;
@@ -75,6 +84,7 @@ public class GenerateMojo extends AbstractMojo {
         String resourcePathPrefix;
         Properties p;
 
+        getLog().info("scmRevision: " + getScmRevision());
         scm = project.getScm();
         webapp = "war".equals(project.getPackaging());
         getLog().info("webapp: " + webapp);
@@ -114,4 +124,25 @@ public class GenerateMojo extends AbstractMojo {
             dest.put("index." + file.getRelative(dir), file.md5());
         }
     }
+
+    protected String getScmRevision() throws MojoExecutionException {
+        ScmRepository repository;
+        InfoScmResult result;
+
+        try {
+            repository = scmManager.makeScmRepository(project.getScm().getConnection());
+            result = scmManager.getProviderByRepository(repository).info(repository.getProviderRepository(),
+                    new ScmFileSet(project.getBasedir()), new CommandParameters());
+        } catch (ScmException e) {
+            throw new MojoExecutionException("scm operation failed: " + e.getMessage(), e);
+        }
+        if (result == null || result.getInfoItems().isEmpty()) {
+            throw new MojoExecutionException("cannot determine scm revision");
+        }
+        if (!result.isSuccess()) {
+            throw new MojoExecutionException("scm operation failed: " + result);
+        }
+        return result.getInfoItems().get(0).getRevision();
+    }
+
 }

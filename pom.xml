@@ -33,6 +33,7 @@
   <properties>
     <maven-license-plugin.header>${basedir}/src/license.header</maven-license-plugin.header>
     <maven.version>3.3.9</maven.version>
+    <maven.scm.version>1.9.4</maven.scm.version>
   </properties>
 
   <dependencies>
@@ -60,6 +61,21 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.maven.scm</groupId>
+      <artifactId>maven-scm-api</artifactId>
+      <version>${maven.scm.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.scm</groupId>
+      <artifactId>maven-scm-manager-plexus</artifactId>
+      <version>${maven.scm.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.scm</groupId>
+      <artifactId>maven-scm-provider-gitexe</artifactId>
+      <version>${maven.scm.version}</version>
+    </dependency>
   </dependencies>
 
 </project>
