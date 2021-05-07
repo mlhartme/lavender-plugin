@@ -89,7 +89,7 @@ public class GenerateMojo extends AbstractMojo {
         getLog().info("webapp: " + webapp);
         name = webapp ? "webapp" : project.getArtifactId();
         path = webapp ? "src/main/webapp" : "src/main/resources";
-        dest = (webapp ? buildDirectory.join(project.getArtifactId(), "WEB-INF") : buildDirectory.join("classes/META-INF")).join("lavender-next.properties");
+        dest = (webapp ? buildDirectory.join(project.getArtifactId(), "WEB-INF") : buildDirectory.join("classes/META-INF")).join("lavender.properties");
         resourcePathPrefix = webapp ? "" : "modules/" + project.getArtifactId() + "/";
         p = new Properties();
         p.put("scm." + name, scm.getConnection());
