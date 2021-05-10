@@ -69,13 +69,34 @@ public class GenerateMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
         try {
+            checkSourceProperties();
             doExecute();
         } catch (IOException e) {
             throw new MojoExecutionException("cannot generate application: " + e.getMessage(), e);
         }
     }
 
-    public void doExecute() throws IOException, MojoExecutionException {
+    /**
+     * We used to have source lavender.properties to configure lavender -- that's no longer supported.
+     * This check makes sure that it's not used. TODO: dump when we've migrated everything to Lavender 2.10
+     */
+    private void checkSourceProperties() throws MojoExecutionException, IOException {
+        FileNode file;
+
+        file = world.file(project.getBasedir()).join(isWebapp()
+                ? "src/main/webapp/WEB-INF/lavender.properties" : "src/main/resources/META-INF/lavender.properties");
+        if (file.exists()) {
+            if (!file.readString().trim().isEmpty()) {
+                throw new MojoExecutionException("source properties not empty: " + file);
+            }
+        }
+    }
+
+    private boolean isWebapp() {
+        return "war".equals(project.getPackaging());
+    }
+
+    private void doExecute() throws IOException, MojoExecutionException {
         Scm scm;
         boolean webapp;
         String name;
@@ -85,7 +106,7 @@ public class GenerateMojo extends AbstractMojo {
         Properties p;
 
         scm = project.getScm();
-        webapp = "war".equals(project.getPackaging());
+        webapp = isWebapp();
         getLog().info("webapp: " + webapp);
         name = webapp ? "webapp" : project.getArtifactId();
         path = webapp ? "src/main/webapp" : "src/main/resources";
