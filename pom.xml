@@ -20,14 +20,14 @@
 
   <groupId>net.oneandone.maven.plugins</groupId>
   <artifactId>lavender</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <scm>
     <connection>scm:git:ssh://git@github.com/mlhartme/lavender-plugin.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mlhartme/lavender-plugin.git</developerConnection>
     <url>scm:git:ssh://git@github.com/mlhartme/lavender-plugin</url>
-    <tag>lavender-1.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
